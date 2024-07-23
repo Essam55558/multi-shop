@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+
+<style>
+    /* Style for Image Slider */
+    .image-slider {
+        width: 80%;
+        height: 50;
+        margin: 0 auto;
+        overflow: hidden;
+    }
+
+    .image-slider .slides {
+        display: flex;
+    }
+
+    .image-slider img {
+        width: 100%;
+        height: auto;
+        object-fit: cover;
+    }
+
+    /* Additional Styles */
+    .product-info {
+        text-align: center;
+        margin-top: 20px;
+    }
+
+    .quantity-buttons {
+        display: inline-block;
+        margin: 0 10px;
+    }
+</style>
+</head>
+
+{% block body %}  
+<div class="container mt-5">
+    <div class="image-slider">
+        <div class="slides">
+            {% for image in images %}
+                    
+                <img class="w-30 h-30" src="{{image.image.url}}" alt="Image" >
+                    
+            {% endfor %}
+            
+            
+
+        </div>
+    </div>
+
+    <form action={% url "cart:add_cart" product.slug %}  method="POST">
+        {% csrf_token %}
+        <div class="product-info">
+            <h2>{{product}}</h2>
+            <p>★★★★★ (99 Reviews)</p>
+            <p class="price">${{product.price}}</p>
+            {% for size in sizes %}
+                        <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" class="custom-control-input" id="size-{{forloop.counter}}" name="size" value="{{ size }}">
+                            <label class="custom-control-label" for="size-{{forloop.counter}}">{{ size }}</label>
+                        </div>
+            {% endfor %} <br>
+                    
+            {% for color in colors %}
+                        <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" class="custom-control-input" id="color-{{forloop.counter}}" name="color" value="{{ color }}">
+                            <label class="custom-control-label" for="color-{{forloop.counter}}">{{ color }}</label>
+                        </div>
+                        {% endfor %}
+
+            <div class="quantity-buttons">
+                <button class="btn btn-secondary btn-minus">-</button>
+                <input type="number" id="quantityInput" value="1" min="1" name="quantity">
+                <button class="btn btn-secondary btn-plus">+</button>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Add To Cart</button>
+        
+            <p>Share on: 
+                <a href="#" class="social-icon"><i class="fab fa-facebook"></i></a>
+                <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
+                <a href="#" class="social-icon"><i class="fab fa-linkedin-in"></i></a>
+                <a href="#" class="social-icon"><i class="fab fa-pinterest-p"></i></a>
+            </p>
+        </div>
+    </form>
+</div>
+
+<script>
+    const images = document.querySelectorAll('.image-slider img');
+    let currentImage = 0;
+
+    function showImage(index) {
+        images.forEach((img) => {
+            img.style.display = 'none';
+        });
+
+        images[index].style.display = 'block';
+    }
+
+    function nextImage() {
+        currentImage = (currentImage + 1) % images.length;
+        showImage(currentImage);
+    }
+
+    function prevImage() {
+        currentImage = (currentImage - 1 + images.length) % images.length;
+        showImage(currentImage);
+    }
+
+    showImage(currentImage);
+
+    setInterval(nextImage, 3000); // Auto slide every 3 seconds
+
+    const btnMinus = document.querySelector('.btn-minus');
+    const btnPlus = document.querySelector('.btn-plus');
+    const quantityInput = document.getElementById('quantityInput');
+
+    btnMinus.addEventListener('click', () => {
+        let quantity = parseInt(quantityInput.value);
+        if (quantity > 1) {
+            quantityInput.value = quantity - 1;
+        }
+    });
+
+    btnPlus.addEventListener('click', () => {
+        let quantity = parseInt(quantityInput.value);
+        quantityInput.value = quantity + 1;
+    });
+</script>
+
+{% endblock body %}  
